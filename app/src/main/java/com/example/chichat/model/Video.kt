@@ -1,5 +1,7 @@
 package com.example.chichat.model
 
+import java.io.Serializable
+
 data class Video(
     val avg_color: Any,
     val duration: Int,
@@ -13,4 +15,4 @@ data class Video(
     val video_files: List<VideoFile>,
     val video_pictures: List<VideoPicture>,
     val width: Int
-)
+) : Serializable
