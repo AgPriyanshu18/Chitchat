@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.chichat.databinding.VideoItemLayoutBinding
 import com.example.chichat.model.ExoPlayerReady
 
-class VideoPlayAdapter(var context: Context, var videos: ArrayList<String>,
+class VideoPlayAdapter(var context: Context, var videos: ArrayList<Pair<String,String>>,
                        var videoReadyListener: OnVideoReadyListener) :
     RecyclerView.Adapter<VideoPlayAdapter.VideoPlayViewHolder>() {
 
@@ -30,13 +30,15 @@ class VideoPlayAdapter(var context: Context, var videos: ArrayList<String>,
         private lateinit var exoPlayer: ExoPlayer
         private lateinit var mediaSource: MediaSource
 
+        val track_name = binding.trackName
+
         @androidx.media3.common.util.UnstableApi
         fun playVideo(Url: String) {
             exoPlayer = ExoPlayer.Builder(context).build()
             exoPlayer.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
                     super.onPlayerError(error)
-                    Toast.makeText(context, "Error PLaying the Video", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Error Playing the Video", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onPlaybackStateChanged(playbackState: Int) {
@@ -53,6 +55,14 @@ class VideoPlayAdapter(var context: Context, var videos: ArrayList<String>,
             exoPlayer.seekTo(0)
             exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
 
+            binding.playerView.setOnClickListener {
+                if (exoPlayer.isPlaying) {
+                    exoPlayer.pause()
+                } else {
+                    exoPlayer.play()
+                }
+            }
+
             val dataSourceFactory = DefaultDataSource.Factory(context)
 
             mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
@@ -61,10 +71,9 @@ class VideoPlayAdapter(var context: Context, var videos: ArrayList<String>,
             exoPlayer.setMediaSource(mediaSource)
             exoPlayer.prepare()
 
-            if (absoluteAdapterPosition == 0) {
-                exoPlayer.playWhenReady = true
-                exoPlayer.play()
-            }
+
+            exoPlayer.playWhenReady = true
+            exoPlayer.play()
 
             videoReadyListener.onVideoReady(ExoPlayerReady(exoPlayer, absoluteAdapterPosition))
         }
@@ -88,8 +97,8 @@ class VideoPlayAdapter(var context: Context, var videos: ArrayList<String>,
     @SuppressLint("UnsafeOptInUsageError")
     override fun onBindViewHolder(holder: VideoPlayViewHolder, position: Int) {
         val model = videos[position]
-
-        holder.playVideo(model)
+        holder.track_name.text = model.first
+        holder.playVideo(model.second)
     }
 
     interface OnVideoReadyListener {

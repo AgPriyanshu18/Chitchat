@@ -43,23 +43,27 @@ class PlayFragment : Fragment() {
     private fun startPlaying(videoUri : Int, videoList : VideoList){
         var cur_video : Int?= null
         val vidList = videoList.videoList
-        var videoUrlList = ArrayList<String>()
+        var videoUrlList = ArrayList<Pair<String,String>>()
         for(i in vidList.indices){
 
             if(vidList[i].id == videoUri){
                 cur_video = i
             }
 
+            val name = vidList[i].url.split("/")
+            val na = name[name.size-2].split("-").toMutableList()
+            var videoName = ""
+            for(i in 0..na.size-2){
+                videoName += na[i] + " "
+            }
+
             for (type in vidList[i].video_files){
                 if(type.quality == "sd"){
-                    videoUrlList.add(type.link)
-                    Log.e("This is the video url", vidList[i].id.toString())
+                    videoUrlList.add(Pair(videoName,type.link))
                     break
                 }
             }
         }
-
-        Log.d("This is the submitted list" , videoUrlList.toString())
 
         adapter = VideoPlayAdapter(requireContext(),videoUrlList , object : VideoPlayAdapter.OnVideoReadyListener{
             override fun onVideoReady(exoPlayerReady: ExoPlayerReady) {
@@ -67,6 +71,7 @@ class PlayFragment : Fragment() {
             }
         })
         binding.viewPager.adapter = adapter
+
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
                 val previousIndex = exoPlayerItems.indexOfFirst { it.exoPlayer.isPlaying }
@@ -94,13 +99,23 @@ class PlayFragment : Fragment() {
         val index = exoPlayerItems.indexOfFirst { it.position == binding.viewPager.currentItem }
         if (index != -1){
             val player = exoPlayerItems[index].exoPlayer
-            player.pause()
-            player.playWhenReady = false
+            player.release()
         }
     }
 
     override fun onResume() {
         super.onResume()
+        val index = exoPlayerItems.indexOfFirst { it.position == binding.viewPager.currentItem }
+        if (index != -1){
+            val player = exoPlayerItems[index].exoPlayer
+            player.playWhenReady = true
+            player.play()
+        }
+
+    }
+
+    override fun onStart() {
+        super.onStart()
         val index = exoPlayerItems.indexOfFirst { it.position == binding.viewPager.currentItem }
         if (index != -1){
             val player = exoPlayerItems[index].exoPlayer

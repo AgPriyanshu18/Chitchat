@@ -56,7 +56,6 @@ class VideoListFragment : Fragment() {
 
         viewModel.videoList.observe(viewLifecycleOwner) {
             adapter.submitData(lifecycle, it)
-
         }
 
         return binding.root

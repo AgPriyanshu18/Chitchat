@@ -5,4 +5,6 @@ object AppConstants {
     var ID : String = "id"
     var VIDEO : String = "video"
     var VIDEO_ID : String = "video_id"
+
+    val query : String = "Nature"
 }

@@ -14,5 +14,6 @@ data class Video(
     val user: User,
     val video_files: List<VideoFile>,
     val video_pictures: List<VideoPicture>,
-    val width: Int
+    val width: Int,
+    val name : String
 ) : Serializable
